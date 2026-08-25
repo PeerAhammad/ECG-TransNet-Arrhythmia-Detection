@@ -1,147 +1,296 @@
-# ECG-TransNet: Architecting Clinical Intelligence 🫀
+# ECG-TransNet: Multi-Dataset CNN–Transformer Framework for Arrhythmia Detection
 
-### A State-of-the-Art Hybrid CNN–Transformer Framework for Arrhythmia Classification
+> A hybrid **1D-CNN + Transformer** framework for ECG arrhythmia classification, combining morphological feature extraction with temporal sequence modeling.
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C.svg)](https://pytorch.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![DOI](https://img.shields.io/badge/DOI-10.13026%2FC2F305-green.svg)](https://doi.org/10.13026/C2F305)
-
----
-
-## 🧬 Overview
-**ECG-TransNet** represents a paradigm shift in automated cardiac diagnostics. By synthesizing the **spatial feature extraction** power of 1D-Residual Convolutional Neural Networks (ResNet) with the **global sequence modeling** capabilities of Transformer Encoders, the framework deciphers complex cardiac morphologies and rhythmic variations with physician-level precision.
-
-Optimized for the **AAMI EC57 standard**, ECG-TransNet specifically addresses the "Long-Tail" problem in medical datasets, ensuring high sensitivity for rare but critical arrhythmic events.
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Status](https://img.shields.io/badge/Status-Completed-brightgreen)
 
 ---
 
-## 🧠 The Hybrid Philosophy: Morphology + Context
-ECG signals are inherently multi-scalar. ECG-TransNet models both domains simultaneously:
+## Overview
 
-1. **Morphological Domain (CNN):** Captures high-frequency micro-structures like QRS complex widening, ST-segment elevation, and T-wave inversions.
-2. **Temporal Domain (Transformer):** Captures macro-rhythmic context, such as R-R interval variability and premature beats that only become apparent across multiple heartbeat cycles.
+**ECG-TransNet** is a research project for automated ECG arrhythmia classification using a hybrid deep learning architecture.
 
+The model combines:
 
+* **1D Convolutional Neural Networks** for local ECG morphology
+* **Transformer encoders** for temporal and contextual dependencies
+* **Explainable AI** techniques for model interpretation
+* **Class-imbalance handling** for underrepresented arrhythmia categories
 
----
+The project is designed around the **AAMI EC57** classification framework and uses ECG data from the **MIT-BIH Arrhythmia Database**.
 
-## 🔥 Key Technical Innovations
-* **Synergistic Architecture:** 1D-CNN front-end serves as a learnable tokenizer for the Transformer backbone.
-* **Clinical XAI (Explainable AI):** Native integration of **Grad-CAM** and **SHAP** to provide heatmaps of diagnostic evidence, ensuring "Black-Box" models are clinically verifiable.
-* **Imbalance Resilience:** Implements weighted cross-entropy and specialized data augmentation to handle the massive prevalence of 'Normal' beats vs. 'Fusion' beats.
-* **Edge-Ready Deployment:** Engineered for sub-15ms inference latency and a compact ~28MB footprint via post-training quantization.
+### Research Status
 
----
-
-## 🏗️ Architecture Deep-Dive
-
-### 1. Convolutional Feature Encoder (The Eye)
-Utilizes deep 1D-Residual blocks to learn shift-invariant patterns. These blocks identify the specific "signature" of various heartbeats regardless of baseline wander or noise.
-
-### 2. Transformer Temporal Encoder (The Brain)
-Implements Multi-Head Self-Attention (MHSA) to compute dependencies between distant beats. This allows the model to "remember" previous beat timings to identify irregular rhythms.
-
-
-
-### 3. Interpretability & Classification
-A global average pooling layer feeds into a high-density linear head, supervised by an interpretability layer that maps neural activations back to the original ECG signal.
+✅ Model and experiments completed
+📄 Currently being prepared for conference submission
 
 ---
 
-## 📊 Dataset & Standards: MIT-BIH
-We utilize the **MIT-BIH Arrhythmia Database**, the global benchmark for ECG signal processing.
+## Motivation
 
-| AAMI Class | Description | Clinical Significance |
-| :--- | :--- | :--- |
-| **N** | Normal / Bundle Branch Block | Baseline cardiac function |
-| **S** | Supraventricular Ectopic | Atrial irregularities |
-| **V** | Ventricular Ectopic | High-risk ventricular events |
-| **F** | Fusion Beats | Hybrid morphological triggers |
-| **Q** | Unknown / Paced | Artifacts or paced rhythms |
+ECG signals contain information at multiple temporal scales.
 
-**Preprocessing Pipeline:**
-* **Filtration:** Butterworth Bandpass (0.5 – 35 Hz) for baseline wander removal.
-* **Normalization:** Z-Score standardization per patient record.
-* **Segmentation:** Pan-Tompkins derived beat-centering.
+Short local patterns can indicate morphological abnormalities, while relationships between successive heartbeats can provide important rhythm information.
 
----
+ECG-TransNet therefore combines two complementary modeling approaches:
 
-## 📈 Performance Benchmarks
-* **Overall Accuracy:** `~98.2%`
-* **Avg. F1-Score:** `~0.94` (AAMI-balanced)
-* **Inference Latency:** `< 12ms` (CPU-optimized)
-* **Memory Footprint:** `27.4 MB` (Quantized)
+**CNN → Morphology**
 
----
+Learns local waveform characteristics such as QRS morphology, ST-segment changes, and T-wave patterns.
 
-## 📂 Modular Repository Structure
-```bash
-ECG-TransNet/
-├── data/                  # Ingestion & Segmented Tensors
-├── preprocessing/         # Signal DSP & Pan-Tompkins Logic
-├── models/                # Architecture Definitions
-│   ├── cnn_encoder.py     # ResNet1D Backbone
-│   ├── transformer.py     # MHSA Modules
-│   └── ecg_transnet.py    # Hybrid Fusion Model
-├── training/              # Optimization & Schedulers
-│   ├── train.py           # Distributed Training Logic
-│   └── evaluate.py        # K-Fold & Metric Aggregation
-├── interpretability/      # Explainable AI Suite
-│   ├── gradcam.py         # Saliency Mapping
-│   └── shap_analysis.py   # Feature Attribution
-├── results/               # Generated Visuals & Weights
-└── README.md
+**Transformer → Temporal Context**
 
-```markdown
-## ⚙️ Installation & Usage
+Models relationships between multiple heartbeat segments, including rhythm variability and beat-to-beat dependencies.
 
-### 🛠️ Setup
-```bash
-git clone [https://github.com/prakulhiremath/ECG-TransNet-Arrhythmia-Detection](https://github.com/prakulhiremath/ECG-TransNet-Arrhythmia-Detection)
-cd ECG-TransNet-Arrhythmia-Detection
-pip install -r requirements.txt
+The overall idea is:
 
+```text
+ECG Signal
+    ↓
+Preprocessing
+    ↓
+1D CNN Feature Extraction
+    ↓
+Transformer Temporal Modeling
+    ↓
+Classification Head
+    ↓
+Arrhythmia Class
 ```
 
-### 🚄 Training
+---
+
+## Model Architecture
+
+### 1. CNN Feature Encoder
+
+The convolutional front-end extracts local features from the ECG waveform.
+
+Its role is to capture morphological patterns that distinguish different heartbeat classes.
+
+### 2. Transformer Encoder
+
+The extracted representations are passed to Transformer layers using multi-head self-attention.
+
+This allows the model to capture relationships across different portions of the ECG sequence rather than treating each local pattern independently.
+
+### 3. Classification
+
+The learned representation is aggregated and passed through a classification head to predict the target arrhythmia category.
+
+---
+
+## Explainability
+
+The project includes explainability methods to investigate which regions of an ECG signal contribute to model predictions.
+
+Current methods include:
+
+* **Grad-CAM** — visualization of activation-based importance
+* **SHAP** — feature-attribution analysis
+
+These methods are intended to make model decisions easier to inspect and analyze during research.
+
+---
+
+## Dataset
+
+The project uses the **MIT-BIH Arrhythmia Database** and follows the AAMI-based beat classification framework.
+
+| Class | Description                    |
+| ----- | ------------------------------ |
+| **N** | Normal and related beats       |
+| **S** | Supraventricular ectopic beats |
+| **V** | Ventricular ectopic beats      |
+| **F** | Fusion beats                   |
+| **Q** | Unknown / paced / other beats  |
+
+### Preprocessing Pipeline
+
+```text
+Raw ECG
+  ↓
+Band-pass filtering
+  ↓
+Baseline/noise processing
+  ↓
+Normalization
+  ↓
+R-peak / beat detection
+  ↓
+Beat-centered segmentation
+  ↓
+Model input
+```
+
+The current preprocessing pipeline includes Butterworth filtering, normalization, and beat-centered segmentation.
+
+---
+
+## Handling Class Imbalance
+
+Arrhythmia datasets are typically highly imbalanced, with normal beats substantially more common than several abnormal classes.
+
+The project therefore includes techniques such as:
+
+* Weighted cross-entropy
+* Data augmentation
+* AAMI-based class organization
+* Class-wise evaluation metrics
+
+The goal is to prevent the model from being dominated by the majority class.
+
+---
+
+## Reported Results
+
+The current project reports the following experimental results:
+
+| Metric               |   Result |
+| -------------------- | -------: |
+| Overall Accuracy     |   ~98.2% |
+| Average F1-Score     |    ~0.94 |
+| Inference Latency    |  < 12 ms |
+| Quantized Model Size | ~27.4 MB |
+
+These values represent the current project benchmarks and should be interpreted together with the corresponding experimental setup and evaluation protocol.
+
+---
+
+## Repository Structure
+
+```text
+ECG-TransNet/
+│
+├── data/                       # Dataset and processed data
+├── preprocessing/              # ECG signal preprocessing
+│
+├── models/                     # Model implementations
+│   ├── cnn_encoder.py
+│   ├── transformer.py
+│   └── ecg_transnet.py
+│
+├── training/                   # Training and evaluation
+│   ├── train.py
+│   └── evaluate.py
+│
+├── interpretability/           # Explainability methods
+│   ├── gradcam.py
+│   └── shap_analysis.py
+│
+├── results/                    # Generated results and visualizations
+│
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## Installation
+
+### Clone the repository
+
+```bash
+git clone https://github.com/PeerAhammad/ECG-TransNet-Arrhythmia-Detection.git
+cd ECG-TransNet-Arrhythmia-Detection
+```
+
+### Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Training
+
+Example training command:
 
 ```bash
 python training/train.py --config configs/production_run.yaml
-
 ```
 
-### 🔍 Explaining Model Decisions
+---
+
+## Model Evaluation
 
 ```bash
-# Generate Grad-CAM heatmaps
-python interpretability/gradcam.py --sample_id 100_beat_5
-
-# Run SHAP feature attribution
-python interpretability/shap_analysis.py
-
+python training/evaluate.py
 ```
 
 ---
 
-## 📝 Citations
+## Explainability
 
-### Research Reference
+### Grad-CAM
 
-> Hiremath, P., Bagawan, M. (2026). **ECG-TransNet: Hybrid CNN-Transformer for Arrhythmia Detection.** GitHub: [prakulhiremath/ECG-TransNet-Arrhythmia-Detection](https://github.com/prakulhiremath/ECG-TransNet-Arrhythmia-Detection)
+```bash
+python interpretability/gradcam.py --sample_id 100_beat_5
+```
 
-### Dataset & Ecosystem
+### SHAP
 
-> 1. Moody GB, Mark RG. *The impact of the MIT-BIH Arrhythmia Database.* IEEE EB, 2001.
-> 2. Goldberger AL, et al. *PhysioBank, PhysioToolkit, and PhysioNet.* Circulation, 2000.
-> **DOI:** [10.13026/C2F305](https://doi.org/10.13026/C2F305)
-> 
-> 
+```bash
+python interpretability/shap_analysis.py
+```
 
 ---
 
-## 🤝 Contributing & License
+## Research Focus
 
-Distributed under the **MIT License**. Contributions that push the boundaries of cardiac AI are welcome via Pull Requests.
+This project explores the intersection of:
 
-**Acknowledgment:** Supported by the PhysioNet research ecosystem. Built with ❤️ for Clinical Cardiology.
+* ECG signal processing
+* Deep learning
+* Transformer architectures
+* Time-series classification
+* Medical AI
+* Explainable AI
+* Imbalanced learning
+
+---
+
+## Future Work
+
+Potential extensions include:
+
+* Evaluation across additional ECG datasets
+* Further cross-dataset generalization experiments
+* Improved explainability evaluation
+* Model calibration and uncertainty estimation
+* Additional efficiency and deployment experiments
+* Conference submission and peer review
+
+---
+
+## Dataset Reference
+
+The project uses the **MIT-BIH Arrhythmia Database** provided through PhysioNet.
+
+**MIT-BIH Arrhythmia Database**
+Moody GB, Mark RG.
+
+**PhysioBank / PhysioToolkit / PhysioNet**
+Goldberger AL et al.
+
+Dataset DOI:
+
+[10.13026/C2F305](https://doi.org/10.13026/C2F305)
+
+---
+
+## Project Status
+
+**Current status: Completed research project**
+
+The core model, experiments, evaluation, and explainability components have been developed. The project is currently being prepared for submission to a suitable research conference.
+
+---
+
+## License
+
+This project is released under the **MIT License**.
